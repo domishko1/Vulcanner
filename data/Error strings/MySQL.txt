@@ -1,0 +1,21 @@
+check the manual that corresponds to your MySQL
+SQL syntax
+server version for the right syntax
+expects parameter 1 to be
+SQL syntax.*?MySQL
+Warning.*?\Wmysqli?_
+MySQLSyntaxErrorException
+valid MySQL result
+check the manual that corresponds to your MySQL server version
+check the manual that corresponds to your MariaDB server version
+check the manual that corresponds to your Drizzle server version
+Unknown column '[^ ]+' in 'field list'
+MySqlClient\.
+com\.mysql\.jdbc
+Zend_Db_(Adapter|Statement)_Mysqli_Exception
+Pdo[./_\\]Mysql
+MySqlException
+SQLSTATE\[\d+\]: Syntax error or access violation
+MemSQL does not support this type of query
+is not supported by MemSQL
+ unsupported nested scalar subselect
