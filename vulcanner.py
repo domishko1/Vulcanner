@@ -1,8 +1,9 @@
+import re
 import sys
 import time
 
-from colors import Colors
 from scanner import Scanner
+from tools.colors import Colors
 
 color = Colors()
 
@@ -30,33 +31,28 @@ def banner():
 
 if __name__ == '__main__':
     scanner = Scanner()
-    # scanner.create_pdf('report' + time.strftime("%H_%M_%S") + '.pdf')
-    # try:
-    #     banner()
-    #     if len(sys.argv) == 2:
-    #         options = argv[1]
-    #     if len(sys.argv) == 3:
-    #         options = argv[1]
-    #         target = argv[2]
-    #     if options == '-u':
-    #         if re.search(r"\A(http|www\.|\w[\w.-]+\.\w{2,})", target) is not None:
-    #             scanner.scanning(target)
-    #         else:
-    #             print(color.WARNING + "  [" + time.strftime("%H:%M:%S") + "] [X] Некорректно введен URL-адрес.")
-    #             print(color.OKBLUE + "  [" + time.strftime(
-    #                 "%H:%M:%S") + "] [*] Пример: http://www.site.com/vuln.php?id=1")
-    #     elif options == '-g' and len(target) != 0:
-    #         scanner.search_urls_with_google_dorks(target)
-    #     elif options == '-h':
-    #         _help()
-    #     scanner.driver.quit()
-    #     exit_scanner()
-    # except:
-    #     print(color.OKBLUE + "  [" + time.strftime(
-    #                 "%H:%M:%S") + "] [X] Ошибка ввода!")
-    #     exit_scanner()
-    # scanner.scanning('http://e3e5.com/article.php?id=23')
-    # app.scanner.driver.quit()
-    scanner.scanning('http://localhost:8080/dvwa/vulnerabilities/sqli/?id=1&Submit=Submit#')
-
-    # app.scanner.driver.quit()
+    scanner.create_pdf('report' + time.strftime("%H_%M_%S") + '.pdf')
+    try:
+        banner()
+        if len(sys.argv) == 2:
+            options = sys.argv[1]
+        if len(sys.argv) == 3:
+            options = sys.argv[1]
+            target = sys.argv[2]
+        if options == '-u':
+            if re.search(r"\A(http|www\.|\w[\w.-]+\.\w{2,})", target) is not None:
+                scanner.scanning(target)
+            else:
+                print(color.WARNING + "  [" + time.strftime("%H:%M:%S") + "] [X] Некорректно введен URL-адрес.")
+                print(color.OKBLUE + "  [" + time.strftime(
+                    "%H:%M:%S") + "] [*] Пример: http://www.site.com/vuln.php?id=1")
+        elif options == '-g' and len(target) != 0:
+            scanner.search_urls_with_google_dorks(target)
+        elif options == '-h':
+            _help()
+        scanner.driver.quit()
+        exit_scanner()
+    except:
+        print(color.OKBLUE + "  [" + time.strftime(
+                    "%H:%M:%S") + "] [X] Ошибка ввода!")
+        exit_scanner()

@@ -1,14 +1,18 @@
 import datetime
+import os
 import random
-import time
 import re  # Поиск уязвимой части веб-запроса
+import time
 import urllib.parse  # Парсинг URL-адреса
 from time import sleep
+
 from selenium import webdriver
-from colors import Colors
-from networkConnection import NetworkConnection
-from report import Report
-import report
+
+from tools import report
+from tools.colors import Colors
+from tools.networkConnection import NetworkConnection
+from tools.report import Report
+
 
 # Загрузка User-Agents
 def loadUserAgents(uafile="data\\User Agent\\user_agents.txt"):
@@ -33,8 +37,8 @@ class Scanner:
                     'method': '',
                     'xss': '',
                     'sql_time': '',
-                    'sql_boolean': '',
-                    'list': ''}
+                    'sql_boolean': ''
+        }
         self.report = Report()
 
     '''
@@ -51,7 +55,7 @@ class Scanner:
             options.add_argument('user-agent={}'.format(self.agent))
         options.add_argument("start-maximized")
         options.add_argument('headless')
-        self.driver = webdriver.Chrome(options=options)
+        self.driver = webdriver.Chrome(options=options, executable_path=os.path.join(os.path.dirname(__file__).replace('/','\\'),'data\\chromedriver.exe'))
 
     '''
     Сканироване URL-адреса
@@ -93,16 +97,14 @@ class Scanner:
                         if method == 'GET':
                             self.scan_sql_blind_time(method, url, fuzz, "All")
                             self.scan_xss(method, url, fuzz)
-                        if len(self.vulnerabilities_report['list']) == 0:
-                            print(self.color.WHITE + "  [" + time.strftime("%H:%M:%S") + "] Параметр " + fuzz + "не "
-                                                                                                                "уязвим!")
                 report.create_report(self.temp_file_name_with_result_of_scanning, self.vulnerabilities_report)
                 print(self.color.WHITE + "  [" + time.strftime(
                     "%H:%M:%S") + "] Результаты сохранены в следующий файл: " + self.temp_file_name_with_result_of_scanning)
                 self.driver.quit()
         except KeyboardInterrupt:
             print(self.color.FAIL + "  [" + time.strftime("%H:%M:%S") + "] Ошибка! ")
-        except:
+        except Exception as ex:
+            print(str(ex))
             print(self.color.EXIT + "  [" + time.strftime("%H:%M:%S") + "] Ошибка")
 
     '''
@@ -151,7 +153,6 @@ class Scanner:
                                                               "AND time-based blind",
                                                               injection)
                         self.vulnerabilities_report['sql_time'] += str(fuzz) + str('|') + str(injection)
-                        self.vulnerabilities_report['list'] += 'B_SQLi|TYPE Time-Based|' + inject + '|DELIMITER|'
                         break
         except:
             print(self.color.FAIL + "  [" + time.strftime(
@@ -191,7 +192,6 @@ class Scanner:
                                                               "AND boolean-based blind",
                                                               injection)
                         self.vulnerabilities_report['sql_boolean'] += str(fuzz) + str('|') + str(injection)
-                        self.vulnerabilities_report['list'] += 'B_SQLi|TYPE Boolean-Based|' + inject + '|DELIMITER|'
                         break
 
         except:
@@ -208,7 +208,7 @@ class Scanner:
     def scan_xss(self, method, url, fuzz):
         try:
             type_of_alerts = ["1"]
-            file_with_payloads = "data\\XSS Payloads\\xss_payloads.txt"
+            file_with_payloads = "data/XSS Payloads/xss_payloads.txt"
             with open(file_with_payloads) as injections_file:
                 for payload in injections_file:
                     try:
@@ -226,7 +226,6 @@ class Scanner:
                         if alert in type_of_alerts:
                             self.print_info_about_vulnerabilities("XSS", fuzz, "", "Cross-Site Scripting", payload)
                             self.vulnerabilities_report['xss'] += str(fuzz) + str('|') + str(payload)
-                            self.vulnerabilities_report['list'] += 'XSS|TYPE|' + inject + '|DELIMITER|'
                             self.driver.quit()
                             self.init_driver()
                             break
@@ -236,7 +235,6 @@ class Scanner:
                                                                   "Cross-Site Scripting (False positive ?)", payload)
                             inject = url + ":" + fuzz + ":" + payload
                             self.vulnerabilities_report['xss'] += str(fuzz) + str('|') + str(inject)
-                            self.vulnerabilities_report['list'] += 'XSS|TYPE|' + inject + '|DELIMITER|'
                             self.driver.quit()
                             self.init_driver()
             injections_file.close()
@@ -282,8 +280,6 @@ class Scanner:
                     "%H:%M:%S") + "] [*] Предположительно, база данных " + str(current_database_name))
                 print(self.color.WHITE + "  [" + time.strftime("%H:%M:%S") + "] [*] Сообщение: " + str(
                     text_from_body).replace('\n', ' ').replace('\r', '').replace('\t', '').replace('  ', ''))
-                with open(self.temp_file_name_with_result_of_scanning, 'a') as file:
-                    file.write(line)
             else:
                 print(
                     self.color.WHITE + "  [" + time.strftime("%H:%M:%S") + "] [X] Не удалось выяснить тип базы данных")

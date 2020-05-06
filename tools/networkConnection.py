@@ -1,7 +1,7 @@
 import http
 import time
 
-from colors import Colors
+from tools.colors import Colors
 
 
 class NetworkConnection:

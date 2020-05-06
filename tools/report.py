@@ -1,8 +1,9 @@
-from fpdf import FPDF
+import os
+
 import fpdf
+from fpdf import FPDF
 
-fpdf.SYSTEM_TTFONTS = 'C:/Users/1/PycharmProjects/scanner_sqlinj/'
-
+fpdf.SYSTEM_TTFONTS = os.path.join(os.path.dirname(__file__).replace('/','\\'),'data\\fonts\\')
 
 def how_to_fix(pdf, filename):
     filename_ = 'data\\Report\\' + filename
@@ -42,8 +43,6 @@ def print_data(pdf, url, method, string_with_injection, type):
 '''
     Создание отчета
 '''
-
-
 def create_report(pdf_path, vulnerabilities_report):
     pdf = Report()
     pdf.add_page()
@@ -62,14 +61,15 @@ def create_report(pdf_path, vulnerabilities_report):
         how_to_fix(pdf, 'SQL.txt')
     if len(xss_inj) != 0:
         how_to_fix(pdf, 'XSS.txt')
-    pdf.output(pdf_path)
+    path = os.path.join(os.path.dirname(__file__).replace('/','\\'), 'results\\').replace('tools','')
+    pdf.output(path + pdf_path, 'F')
 
 
 class Report(FPDF):
 
     def header(self):
         # Устанавливаем лого
-        self.image('vulcanner.jpg', 10, 10, 50)  # y/x/%
+        self.image('data\\vulcanner.jpg', 10, 10, 50)  # y/x/%
         self.add_font('DejaVu', '', 'DejaVuSansCondensed.ttf', uni=True)
         self.set_font('DejaVu', '', 14)
         col_width = self.w / 1.5
